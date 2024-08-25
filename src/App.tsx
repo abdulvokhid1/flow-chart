@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import Button from "@mui/material/Button";
-import { Container } from "@mui/material";
 import ColorPicker from "./components/ColorPicker";
 
 interface Box {
@@ -15,9 +13,6 @@ interface Box {
 }
 
 const App: React.FC = () => {
-  const [inputValue, setInputValue] = useState<string>("");
-  const maxLength = 100;
-
   const [activeButton, setActiveButton] = useState<string | null>(null);
 
   const [title, setTitle] = useState<string>("");
@@ -28,18 +23,13 @@ const App: React.FC = () => {
   const [height, setHeight] = useState<number>(129); // Default height
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  // State for color picker
   const [isColorPickerVisible, setIsColorPickerVisible] =
     useState<boolean>(false);
   const [colorPickerPosition, setColorPickerPosition] = useState<{
     x: number;
     y: number;
   }>({ x: 0, y: 0 });
-  const [selectedColor, setSelectedColor] = useState<string>("#868E96"); // Color for new boxes
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  };
+  const [selectedColor, setSelectedColor] = useState<string>("#000000"); // Color for new boxes
 
   // Retrieve boxes from local storage on component mount
   useEffect(() => {
@@ -77,8 +67,7 @@ const App: React.FC = () => {
 
     setActiveButton(buttonId);
 
-    if (title && state && content) {
-      // Add a new box to the list
+    if (title && content) {
       const newBox: Box = {
         title,
         state,
@@ -89,14 +78,13 @@ const App: React.FC = () => {
         background: "#CED4DA",
       };
       setBoxes((prevBoxes) => [...prevBoxes, newBox]);
-      // Clear the input fields
       setTitle("");
       setState("");
       setContent("");
-      setWidth(212); // Reset width
-      setHeight(129); // Reset height
-      setSelectedColor("#868E96"); // Reset color
-      setSelectedIndex(null); // Reset selected index
+      setWidth(212);
+      setHeight(129);
+      setSelectedColor("#868E96");
+      setSelectedIndex(null);
     } else {
       alert("모든 필드가 필수입니다.");
     }
@@ -115,15 +103,13 @@ const App: React.FC = () => {
   const handleButtonCancel = (buttonId: string) => {
     setActiveButton(buttonId);
 
-    if (title && state && content) {
-      // Clear the input fields
+    if (title && content) {
       setTitle("");
-      setState("");
       setContent("");
-      setWidth(212); // Reset width
-      setHeight(129); // Reset height
-      setSelectedColor("#868E96"); // Reset color
-      setSelectedIndex(null); // Reset selected index
+      setWidth(212);
+      setHeight(129);
+      setSelectedColor("#868E96");
+      setSelectedIndex(null);
     }
   };
 
@@ -136,7 +122,7 @@ const App: React.FC = () => {
   };
 
   const handleColorSelect = (color: string) => {
-    setSelectedColor(color); // Set the selected color for new boxes
+    setSelectedColor(color);
     setIsColorPickerVisible(false);
   };
 
@@ -151,13 +137,13 @@ const App: React.FC = () => {
   const getIconForState = (state: string) => {
     switch (state) {
       case "진행중":
-        return "./img/ic-proceeding.svg"; // Icon for "In Progress"
+        return "./img/ic-proceeding.svg";
       case "완료":
-        return "./img/ic-complete.svg"; // Icon for "Completed"
+        return "./img/ic-complete.svg";
       case "대기중":
-        return "./img/ic-waiting.svg"; // Icon for "Pending"
+        return "./img/ic-waiting.svg";
       default:
-        return ""; // Default or fallback icon if needed
+        return "";
     }
   };
 
@@ -171,7 +157,7 @@ const App: React.FC = () => {
           <div className="left-content">
             <div className="buttons">
               <button
-                className="추가"
+                className="add-button"
                 onClick={handleButtonClick}
                 style={{
                   color: activeButton === "button1" ? "white" : "#6200EE",
@@ -183,7 +169,7 @@ const App: React.FC = () => {
               </button>
 
               <button
-                className="취소"
+                className="cancel-button"
                 onClick={() => handleButtonCancel("button2")}
                 style={{
                   color: activeButton === "button2" ? "white" : "#6200EE",
@@ -194,7 +180,7 @@ const App: React.FC = () => {
                 취소
               </button>
             </div>
-            <div className="제목">
+            <div className="title">
               <p>제목</p>
               <input
                 value={title}
@@ -203,7 +189,7 @@ const App: React.FC = () => {
                 maxLength={30}
               />
             </div>
-            <div className="제목">
+            <div className="title">
               <p>상태</p>
               <select
                 style={{
@@ -222,7 +208,7 @@ const App: React.FC = () => {
                 <option value="대기중">대기중</option>
               </select>
             </div>
-            <div className="제목">
+            <div className="title">
               <p>내용</p>
               <input
                 style={{
@@ -240,6 +226,7 @@ const App: React.FC = () => {
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
+                gap: "14px",
               }}
             >
               <p>선 색</p>
@@ -265,6 +252,7 @@ const App: React.FC = () => {
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
+                gap: "5px",
               }}
             >
               <p>배경색</p>
@@ -280,13 +268,13 @@ const App: React.FC = () => {
               ></button>
             </div>
             <div className="border"></div>
-            <div className="크기">
+            <div className="size">
               <p>크기</p>
-              <p className="크기text">
+              <p className="size-text">
                 모든 단계에 동일한 사이즈가 적용 됩니다.
               </p>
             </div>
-            <div className="크기size">
+            <div className="width-size">
               <p>넓이</p>
               <input
                 type="number"
@@ -299,7 +287,7 @@ const App: React.FC = () => {
                 max={1000}
               />
             </div>
-            <div className="크기size">
+            <div className="width-size">
               <p>높이</p>
               <input
                 type="number"
@@ -325,7 +313,7 @@ const App: React.FC = () => {
                 height: `${box.height}px`,
                 boxShadow:
                   selectedIndex === index
-                    ? "0 0 10px 12px #a4faff" // Red shadow for selected box
+                    ? "0 0 10px 12px #a4faff"
                     : "0 0 5px 1px #CED4DA",
                 position: "relative",
               }}
@@ -355,7 +343,14 @@ const App: React.FC = () => {
               >
                 <div className="title-icon">
                   <img src={getIconForState(box.state)} alt="" />
-                  <h3>{box.state}</h3>
+                  {box.state ? (
+                    <h3>{box.state}</h3>
+                  ) : (
+                    <div className="title-state">
+                      <img src="img/ic-complete.svg" alt="" />
+                      <h3>{box.title}</h3>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <button
