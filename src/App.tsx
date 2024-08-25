@@ -4,6 +4,15 @@ import Button from "@mui/material/Button";
 import { Container } from "@mui/material";
 import ColorPicker from "./components/ColorPicker";
 
+interface Box {
+  title: string;
+  state: string;
+  content: string;
+  width: number;
+  height: number;
+  color: string;
+}
+
 const App: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const maxLength = 100;
@@ -14,6 +23,17 @@ const App: React.FC = () => {
   const [content, setContent] = useState<string>("");
   const [state, setState] = useState<string>("");
   const [boxes, setBoxes] = useState<Box[]>([]);
+  const [width, setWidth] = useState<number>(212); // Default width
+  const [height, setHeight] = useState<number>(129); // Default height
+
+  // State for color picker
+  const [isColorPickerVisible, setIsColorPickerVisible] =
+    useState<boolean>(false);
+  const [colorPickerPosition, setColorPickerPosition] = useState<{
+    x: number;
+    y: number;
+  }>({ x: 0, y: 0 });
+  const [selectedColor, setSelectedColor] = useState<string>("#868E96"); // Color for new boxes
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -30,6 +50,11 @@ const App: React.FC = () => {
         console.error("Failed to parse boxes from local storage", e);
       }
     }
+    // Load the saved color
+    const savedColor = localStorage.getItem("selectedColor");
+    if (savedColor) {
+      setSelectedColor(savedColor);
+    }
   }, []);
 
   // Save boxes to local storage whenever boxes change
@@ -40,13 +65,42 @@ const App: React.FC = () => {
     }
   }, [boxes]);
 
+  // Save selected color to local storage when it changes
+  useEffect(() => {
+    localStorage.setItem("selectedColor", selectedColor);
+  }, [selectedColor]);
+
   const handleButtonClick = (buttonId: string) => {
     setActiveButton(buttonId);
 
     if (title && state && content) {
       // Add a new box to the list
-      const newBox: Box = { title, state, content };
+      const newBox: Box = {
+        title,
+        state,
+        content,
+        width,
+        height,
+        color: selectedColor,
+      };
       setBoxes((prevBoxes) => [...prevBoxes, newBox]);
+      // Clear the input fields
+      setTitle(title);
+      setState(state);
+      setContent(content);
+      setWidth(width); // Reset width
+      setHeight(height); // Reset height
+      setSelectedColor("#868E96"); //Reset color
+    } else {
+      alert("All fields are required.");
+    }
+  };
+
+  const handleButtonCancel = (buttonId: string) => {
+    setActiveButton(buttonId);
+
+    if (title && state && content) {
+      // Add a new box to the list
       // Clear the input fields
       setTitle("");
       setState("");
@@ -54,30 +108,19 @@ const App: React.FC = () => {
     }
   };
 
-  // State for color picker
-  const [isColorPickerVisible, setIsColorPickerVisible] =
-    useState<boolean>(false);
-  const [colorPickerPosition, setColorPickerPosition] = useState<{
-    x: number;
-    y: number;
-  }>({ x: 0, y: 0 });
-  const [selectedColor, setSelectedColor] = useState<string>("#ffffff");
-  const [bodyTextColor, setBodyTextColor] = useState<string>("#000000");
-
   const handleColorSquareClick = (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
-    // Set the position for the ColorPicker and show it
     const rect = event.currentTarget.getBoundingClientRect();
     setColorPickerPosition({ x: rect.left, y: rect.bottom });
     setIsColorPickerVisible(true);
   };
 
   const handleColorSelect = (color: string) => {
-    setSelectedColor(color);
-    setBodyTextColor(color);
-    setIsColorPickerVisible(false); // Close the color picker after selection
+    setSelectedColor(color); // Set the selected color for new boxes
+    setIsColorPickerVisible(false);
   };
+
   const handleDelete = (index: number) => {
     setBoxes((prevBoxes) => {
       const updatedBoxes = prevBoxes.filter((_, i) => i !== index);
@@ -85,11 +128,6 @@ const App: React.FC = () => {
       return updatedBoxes;
     });
   };
-  interface Box {
-    title: string;
-    state: string;
-    content: string;
-  }
 
   return (
     <div className="container">
@@ -109,23 +147,23 @@ const App: React.FC = () => {
                     activeButton === "button1" ? "#6200EE" : "white",
                 }}
               >
-                + 추가
+                + add
               </button>
 
               <button
                 className="취소"
-                onClick={() => handleButtonClick("button2")}
+                onClick={() => handleButtonCancel("button2")}
                 style={{
                   color: activeButton === "button2" ? "white" : "#6200EE",
                   backgroundColor:
                     activeButton === "button2" ? "#6200EE" : "white",
                 }}
               >
-                취소
+                cancel{" "}
               </button>
             </div>
             <div className="제목">
-              <h1>제목</h1>
+              <h1>title</h1>
               <input
                 value={title}
                 type="text"
@@ -134,11 +172,11 @@ const App: React.FC = () => {
               />
             </div>
             <div className="제목">
-              <h1>상태</h1>
+              <h1>action</h1>
               <select
                 style={{
-                  width: "147px",
-                  height: "25px",
+                  width: "172px",
+                  height: "32px",
                   border: "none",
                 }}
                 name=""
@@ -146,13 +184,14 @@ const App: React.FC = () => {
                 value={state}
                 onChange={(e) => setState(e.target.value)}
               >
-                <option value="진행중">진행중</option>
-                <option value="완료">완료</option>
-                <option value="대기중">대기중</option>
+                <option value=""></option>
+                <option value="진행중">proceeding</option>
+                <option value="완료">done</option>
+                <option value="대기중">waiting</option>
               </select>
             </div>
             <div className="제목">
-              <h1>내용</h1>
+              <h1>content</h1>
               <input
                 style={{
                   height: "55px",
@@ -171,12 +210,12 @@ const App: React.FC = () => {
                 alignItems: "center",
               }}
             >
-              <h1>선 색</h1>
+              <h1>color</h1>
               <button
                 style={{
                   width: "30px",
                   height: "30px",
-                  backgroundColor: selectedColor,
+                  background: selectedColor,
                   border: "1px solid #000",
                   marginLeft: "10px",
                 }}
@@ -189,23 +228,63 @@ const App: React.FC = () => {
                 />
               )}
             </div>
-            <div>
-              <h1>배경색</h1>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <h1>backgroundColor</h1>
+              <button
+                style={{
+                  width: "30px",
+                  height: "30px",
+                  backgroundColor: "#CED4DA",
+                  border: "1px solid #000",
+                  marginLeft: "10px",
+                }}
+                // onClick={handleColorSquareClick}
+              ></button>
+              {/* {isColorPickerVisible && (
+                <ColorPicker
+                  position={colorPickerPosition}
+                  handleClick={handleColorSelect}
+                />
+              )} */}
             </div>
             <div className="border"></div>
             <div className="크기">
-              <h1>크기</h1>
+              <h1>size</h1>
               <p className="크기text">
                 모든 단계에 동일한 사이즈가 적용 됩니다.
               </p>
             </div>
             <div className="크기size">
-              <h1>제목</h1>
-              <input type="text" />
+              <h1>width</h1>
+              <input
+                type="number"
+                placeholder="Width (max 1000)"
+                value={width}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value, 10);
+                  setWidth(value > 1000 ? 1000 : value);
+                }}
+                max={1000}
+              />
             </div>
             <div className="크기size">
-              <h1>높이</h1>
-              <input type="text" />
+              <h1>height</h1>
+              <input
+                type="number"
+                placeholder="Height (max 1000)"
+                value={height}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value, 10);
+                  setHeight(value > 1000 ? 1000 : value);
+                }}
+                max={1000}
+              />
             </div>
           </div>
         </div>
@@ -214,25 +293,32 @@ const App: React.FC = () => {
           {boxes.map((box, index) => (
             <div
               className="content"
-              style={{ color: bodyTextColor }}
+              style={{
+                width: `${box.width}px`,
+                height: `${box.height}px`,
+                color: box.color,
+                // background: "#CED4DA",
+              }}
               key={index}
             >
               <div
                 style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
+                  background: box.color,
                 }}
+                className="bodytitle"
               >
-                <h3>{box.title}</h3>
+                {box.state === "대기중" ? (
+                  <img src="./img/ic-waiting.svg" alt="" />
+                ) : (
+                  <img src="./img/ic-proceeding.svg" alt="" />
+                )}
+                <h3>{box.state}</h3>
                 <button onClick={() => handleDelete(index)}>x</button>
               </div>
               <p>
                 <strong>State:</strong> {box.state}
               </p>
-              <p>
-                <strong>Content:</strong> {box.content}
-              </p>
+              <p>{box.content}</p>
             </div>
           ))}
         </div>
