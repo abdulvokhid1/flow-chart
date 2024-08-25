@@ -29,8 +29,9 @@ export default function ColorPicker({
   handleClick,
 }: colorPickerType) {
   const colors = [
+    "black",
     "#CED4DA",
-    "#868E96",
+    // "#868E96",
     "#FA5252",
     "#BE4BDB",
     "#4C6EF5",

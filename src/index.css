@@ -116,3 +116,32 @@ input {
   align-items: center;
   border-radius: 10px 10px 0px 0px;
 }
+.title-part {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 212px;
+  height: 48px;
+  align-items: center;
+  border-radius: 10px 10px 0px 0px;
+}
+.title-icon {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 10px 10px 10px;
+}
+.icon-btn {
+  background: none;
+  border: none;
+  color: #000000bd;
+  width: 24px;
+  height: 24px;
+  margin: 10px 10px 10px 10px;
+}
+.title-content {
+  margin-top: 10px;
+  margin-left: 15px;
+}

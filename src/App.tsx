@@ -11,6 +11,7 @@ interface Box {
   width: number;
   height: number;
   color: string;
+  background: string;
 }
 
 const App: React.FC = () => {
@@ -25,6 +26,7 @@ const App: React.FC = () => {
   const [boxes, setBoxes] = useState<Box[]>([]);
   const [width, setWidth] = useState<number>(212); // Default width
   const [height, setHeight] = useState<number>(129); // Default height
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   // State for color picker
   const [isColorPickerVisible, setIsColorPickerVisible] =
@@ -70,7 +72,9 @@ const App: React.FC = () => {
     localStorage.setItem("selectedColor", selectedColor);
   }, [selectedColor]);
 
-  const handleButtonClick = (buttonId: string) => {
+  const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const buttonId = (event.currentTarget as HTMLButtonElement).id;
+
     setActiveButton(buttonId);
 
     if (title && state && content) {
@@ -82,29 +86,44 @@ const App: React.FC = () => {
         width,
         height,
         color: selectedColor,
+        background: "#CED4DA",
       };
       setBoxes((prevBoxes) => [...prevBoxes, newBox]);
       // Clear the input fields
-      setTitle(title);
-      setState(state);
-      setContent(content);
-      setWidth(width); // Reset width
-      setHeight(height); // Reset height
-      setSelectedColor("#868E96"); //Reset color
+      setTitle("");
+      setState("");
+      setContent("");
+      setWidth(212); // Reset width
+      setHeight(129); // Reset height
+      setSelectedColor("#868E96"); // Reset color
+      setSelectedIndex(null); // Reset selected index
     } else {
-      alert("All fields are required.");
+      alert("모든 필드가 필수입니다.");
     }
+  };
+
+  const handleStepClick = (index: number) => {
+    setSelectedIndex(index);
+    setTitle(boxes[index].title);
+    setState(boxes[index].state);
+    setContent(boxes[index].content);
+    setWidth(boxes[index].width);
+    setHeight(boxes[index].height);
+    setSelectedColor(boxes[index].color);
   };
 
   const handleButtonCancel = (buttonId: string) => {
     setActiveButton(buttonId);
 
     if (title && state && content) {
-      // Add a new box to the list
       // Clear the input fields
       setTitle("");
       setState("");
       setContent("");
+      setWidth(212); // Reset width
+      setHeight(129); // Reset height
+      setSelectedColor("#868E96"); // Reset color
+      setSelectedIndex(null); // Reset selected index
     }
   };
 
@@ -129,6 +148,19 @@ const App: React.FC = () => {
     });
   };
 
+  const getIconForState = (state: string) => {
+    switch (state) {
+      case "진행중":
+        return "./img/ic-proceeding.svg"; // Icon for "In Progress"
+      case "완료":
+        return "./img/ic-complete.svg"; // Icon for "Completed"
+      case "대기중":
+        return "./img/ic-waiting.svg"; // Icon for "Pending"
+      default:
+        return ""; // Default or fallback icon if needed
+    }
+  };
+
   return (
     <div className="container">
       <div className="top">
@@ -140,14 +172,14 @@ const App: React.FC = () => {
             <div className="buttons">
               <button
                 className="추가"
-                onClick={() => handleButtonClick("button1")}
+                onClick={handleButtonClick}
                 style={{
                   color: activeButton === "button1" ? "white" : "#6200EE",
                   backgroundColor:
                     activeButton === "button1" ? "#6200EE" : "white",
                 }}
               >
-                + add
+                + 추가
               </button>
 
               <button
@@ -159,11 +191,11 @@ const App: React.FC = () => {
                     activeButton === "button2" ? "#6200EE" : "white",
                 }}
               >
-                cancel{" "}
+                취소
               </button>
             </div>
             <div className="제목">
-              <h1>title</h1>
+              <p>제목</p>
               <input
                 value={title}
                 type="text"
@@ -172,7 +204,7 @@ const App: React.FC = () => {
               />
             </div>
             <div className="제목">
-              <h1>action</h1>
+              <p>상태</p>
               <select
                 style={{
                   width: "172px",
@@ -185,13 +217,13 @@ const App: React.FC = () => {
                 onChange={(e) => setState(e.target.value)}
               >
                 <option value=""></option>
-                <option value="진행중">proceeding</option>
-                <option value="완료">done</option>
-                <option value="대기중">waiting</option>
+                <option value="진행중">진행중</option>
+                <option value="완료">완료</option>
+                <option value="대기중">대기중</option>
               </select>
             </div>
             <div className="제목">
-              <h1>content</h1>
+              <p>내용</p>
               <input
                 style={{
                   height: "55px",
@@ -210,13 +242,13 @@ const App: React.FC = () => {
                 alignItems: "center",
               }}
             >
-              <h1>color</h1>
+              <p>선 색</p>
               <button
                 style={{
                   width: "30px",
                   height: "30px",
                   background: selectedColor,
-                  border: "1px solid #000",
+                  border: "none",
                   marginLeft: "10px",
                 }}
                 onClick={handleColorSquareClick}
@@ -235,33 +267,27 @@ const App: React.FC = () => {
                 alignItems: "center",
               }}
             >
-              <h1>backgroundColor</h1>
+              <p>배경색</p>
               <button
                 style={{
                   width: "30px",
                   height: "30px",
+
                   backgroundColor: "#CED4DA",
-                  border: "1px solid #000",
+                  border: "none",
                   marginLeft: "10px",
                 }}
-                // onClick={handleColorSquareClick}
               ></button>
-              {/* {isColorPickerVisible && (
-                <ColorPicker
-                  position={colorPickerPosition}
-                  handleClick={handleColorSelect}
-                />
-              )} */}
             </div>
             <div className="border"></div>
             <div className="크기">
-              <h1>size</h1>
+              <p>크기</p>
               <p className="크기text">
                 모든 단계에 동일한 사이즈가 적용 됩니다.
               </p>
             </div>
             <div className="크기size">
-              <h1>width</h1>
+              <p>넓이</p>
               <input
                 type="number"
                 placeholder="Width (max 1000)"
@@ -274,7 +300,7 @@ const App: React.FC = () => {
               />
             </div>
             <div className="크기size">
-              <h1>height</h1>
+              <p>높이</p>
               <input
                 type="number"
                 placeholder="Height (max 1000)"
@@ -292,33 +318,63 @@ const App: React.FC = () => {
         <div className="right-container">
           {boxes.map((box, index) => (
             <div
-              className="content"
+              key={index}
+              className={`content ${selectedIndex === index ? "selected" : ""}`}
               style={{
                 width: `${box.width}px`,
                 height: `${box.height}px`,
-                color: box.color,
-                // background: "#CED4DA",
+                boxShadow:
+                  selectedIndex === index
+                    ? "0 0 10px 12px #a4faff" // Red shadow for selected box
+                    : "0 0 5px 1px #CED4DA",
+                position: "relative",
               }}
-              key={index}
+              onClick={() => handleStepClick(index)}
             >
+              {index < boxes.length - 1 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    right: "-20px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    border: "solid #6200EE",
+                    borderWidth: "5px 0 5px 5px",
+                    borderColor: "transparent transparent transparent #6200EE",
+                    width: 0,
+                    height: 0,
+                  }}
+                ></div>
+              )}
               <div
+                className="title-part"
                 style={{
-                  background: box.color,
+                  background: box.background,
+                  color: box.color,
                 }}
-                className="bodytitle"
               >
-                {box.state === "대기중" ? (
-                  <img src="./img/ic-waiting.svg" alt="" />
-                ) : (
-                  <img src="./img/ic-proceeding.svg" alt="" />
-                )}
-                <h3>{box.state}</h3>
-                <button onClick={() => handleDelete(index)}>x</button>
+                <div className="title-icon">
+                  <img src={getIconForState(box.state)} alt="" />
+                  <h3>{box.state}</h3>
+                </div>
+                <div>
+                  <button
+                    className="icon-btn"
+                    onClick={() => handleDelete(index)}
+                  >
+                    <p>x</p>
+                  </button>
+                </div>
               </div>
-              <p>
-                <strong>State:</strong> {box.state}
-              </p>
-              <p>{box.content}</p>
+              <div className="title-content">
+                <p
+                  style={{
+                    color: box.color,
+                  }}
+                >
+                  {box.content}
+                </p>
+              </div>
             </div>
           ))}
         </div>
