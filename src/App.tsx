@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import ColorPicker from "./components/ColorPicker";
+import { stat } from "fs";
 
 interface Box {
   title: string;
@@ -19,8 +20,8 @@ const App: React.FC = () => {
   const [content, setContent] = useState<string>("");
   const [state, setState] = useState<string>("");
   const [boxes, setBoxes] = useState<Box[]>([]);
-  const [width, setWidth] = useState<number>(212); // Default width
-  const [height, setHeight] = useState<number>(129); // Default height
+  const [width, setWidth] = useState<number>(212);
+  const [height, setHeight] = useState<number>(129);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const [isColorPickerVisible, setIsColorPickerVisible] =
@@ -29,7 +30,7 @@ const App: React.FC = () => {
     x: number;
     y: number;
   }>({ x: 0, y: 0 });
-  const [selectedColor, setSelectedColor] = useState<string>("#000000"); // Color for new boxes
+  const [selectedColor, setSelectedColor] = useState<string>("#000000");
 
   // Retrieve boxes from local storage on component mount
   useEffect(() => {
@@ -83,7 +84,7 @@ const App: React.FC = () => {
       setContent("");
       setWidth(212);
       setHeight(129);
-      setSelectedColor("#868E96");
+      setSelectedColor("#000000");
       setSelectedIndex(null);
     } else {
       alert("모든 필드가 필수입니다.");
@@ -103,9 +104,10 @@ const App: React.FC = () => {
   const handleButtonCancel = (buttonId: string) => {
     setActiveButton(buttonId);
 
-    if (title && content) {
+    if (title && content && state) {
       setTitle("");
       setContent("");
+      setState("");
       setWidth(212);
       setHeight(129);
       setSelectedColor("#868E96");
